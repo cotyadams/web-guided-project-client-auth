@@ -1,13 +1,31 @@
 import React from 'react';
 import moment from 'moment';
 import Loader from 'react-loader-spinner';
+import axiosWithAuth from '../util/axiosWithAuth';
 
 class GasPrices extends React.Component {
   state = {
     gasPrices: []
   };
-  
-
+  componentDidMount() {
+    this.getData();
+  }
+  getData = () => {
+    axiosWithAuth()
+      .get('http://localhost:5001/api/data')
+      .then((res) => {
+        this.setState({
+          gasPrices: [...res.data.data.filter((gasData) => {
+            return (gasData.type === "Gasoline - Regular" &&
+            gasData.location === "US" ||
+            gasData.location === 'State of Hawaii')
+          })]
+        })
+        console.log(this.state)
+      }).catch((err) => {
+        console.error(err)
+      })
+  }
   formatData = () => {
     const formattedData = [];
     this.state.gasPrices.forEach((price, index, arr) => {
@@ -22,7 +40,7 @@ class GasPrices extends React.Component {
     });
     return formattedData;
   };
-
+  
   render() {
     const gasPrices = this.formatData();
     return (

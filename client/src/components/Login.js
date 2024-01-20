@@ -10,6 +10,7 @@ class Login extends React.Component {
   };
 
   handleChange = e => {
+    console.log(e.target.value)
     this.setState({
       credentials: {
         ...this.state.credentials,
@@ -20,6 +21,20 @@ class Login extends React.Component {
 
   login = e => {
     e.preventDefault();
+    console.log(this.state.credentials)
+    axios.post('http://localhost:5001/api/login', this.state.credentials)
+      .then((res) => {
+        localStorage.setItem('token', res.data.token)
+        this.props.history.push('/protected')
+      }).catch((err) => {
+      console.error(err)
+    })
+    this.setState({
+      credentials: {
+        username: '',
+        password: ''
+      }
+    })
   };
 
   render() {
@@ -38,7 +53,7 @@ class Login extends React.Component {
             value={this.state.credentials.password}
             onChange={this.handleChange}
           />
-          <button>Log in</button>
+          <button type='submit'>Log in</button>
         </form>
       </div>
     );
